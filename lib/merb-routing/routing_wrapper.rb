@@ -10,6 +10,17 @@ end
 class ActionController::Routing::MerbRoutingWrapper
   # this setter is used by rails dispatcher but isn't actually used by us
   attr_writer :configuration_file
+  attr_accessor :configuration_files, :routes, :named_routes
+
+  def initialize
+    self.configuration_files = []
+
+    self.routes = []
+  end
+
+  def add_configuration_file(path)
+    self.configuration_files << path
+  end
 
   def configuration_file
     "#{RAILS_ROOT}/config/router.rb"
@@ -37,10 +48,21 @@ class ActionController::Routing::MerbRoutingWrapper
     load configuration_file
   end
 
+  def reload!
+    reload
+  end
+
   # given a request object, this matches a route, sets route/path_parameters, and returns the controller class
   def recognize(request)
-    request.route, request.path_parameters = Merb::Router.route_for(request)
+    request.route, params = Merb::Router.route_for(request)
+    request.path_parameters = params.with_indifferent_access
     "#{request.path_parameters[:controller].camelize}Controller".constantize
+  end
+
+  def call(env)
+    request = ActionController::Request.new(env)
+    app = ActionController::Routing::Routes.recognize(request)
+    app.call(env).to_a
   end
 
   # given a hash of params, this determines the best route for us
@@ -88,7 +110,7 @@ end
 silence_warnings { ActionController::Routing::Routes = ActionController::Routing::MerbRoutingWrapper.new }
 
 # merb calls request.uri sometimes... map it to request_uri
-ActionController::AbstractRequest.class_eval { alias :uri :request_uri }
+ActionController::Request.class_eval { alias :uri :request_uri }
   
 # store the route we ended up recognizing so we can use url(:this)
-ActionController::AbstractRequest.class_eval { attr_accessor :route }
+ActionController::Request.class_eval { attr_accessor :route }
