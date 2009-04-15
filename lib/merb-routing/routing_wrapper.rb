@@ -80,18 +80,33 @@ class ActionController::Routing::MerbRoutingWrapper
         best_score, best_route = score, route if score > best_score
       end
     end
-
-    keys_we_dont_need = best_route.params.reject { |k,v| !(v =~ /^"(.*)"$/ && merged_options[k] == $1) }.keys
-    nonredundant_options = options.reject { |k,v| keys_we_dont_need.include?(k) }
+    debugger if best_route.nil?
+    @keys_we_dont_need = best_route.params.reject { |k,v| !(v =~ /^"(.*)"$/ && merged_options[k] == $1) }.keys
+    nonredundant_options = options.reject { |k,v| @keys_we_dont_need.include?(k) }
 
     best_route.generate([nonredundant_options], recall)
   end
 
   def routes_for_controller_and_action(controller, action)
+    action = action.to_s
     @routes_by_controller ||= {}
     @routes_by_controller[controller] ||= {}
     @routes_by_controller[controller][action] ||= Merb::Router.routes.reject { |route| (route.params[:controller] =~ /^"(.*)"$/ && $1 != controller) || (route.params[:action] =~ /^"(.*)"$/ && $1 != action) }
   end
+  
+  # rspec-rails needs this to be defined.
+  # description from Rails doc: Generate the path indicated by the arguments, and return 
+  # an array of the keys that were not used to generate it.
+  def empty?
+    Merb::Router.routes.empty?
+  end
+  
+  # rspec-rails also needs this one to be defined
+  def extra_keys(hash, recall={})
+    generate( hash, recall) # called for side-effect: set @keys_we_dont_need
+    @keys_we_dont_need  - [:controller, :action] # it seems we always need controller and action
+  end
+  
 end
 
 # automatically use :to_params or :id on active record objects
