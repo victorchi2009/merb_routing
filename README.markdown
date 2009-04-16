@@ -18,11 +18,21 @@ Put this in your Spec::Runner.configure block in spec_helper.rb
    
 ## What Works ##
 
-It looks like routing and URL generation work in running apps and in rspec specs. Both route\_for and params\_from work fine when called from rspec examples.
+It looks like routing and URL generation work in running apps and in rspec specs. Both route\_for and params\_from work fine when called from rspec examples. So this will work (in a Rails project that includes this plugin):
+
+    script/generate rspec_scaffold Frooble name:string color:string description:text
+    rake db:migrate
+    rake spec
+    
+That's testing model, controller and routes.
 
 ## What's Still Broken ##
 
-Cucumber stories fail like this:
+Cucumber stories still fail, so if you do something like (the canonical [Cucumber example](http://wiki.github.com/aslakhellesoy/cucumber/ruby-on-rails)):
+
+    ruby script/generate feature Frooble name:string color:string description:text
+    
+you will see one error:
 
     When I delete the 3rd frooble             # features/step_definitions/frooble_steps.rb:5
       You have a nil object when you didn't expect it!
