@@ -8,8 +8,7 @@ See the [announcement](http://blog.hungrymachine.com/2008/12/29/merb-routing-in-
 
 Ruby on Rails version 2.3.2 thanks to [Piotr Sarnacki](http://drogomir.com/blog)
 
-Provisional support for rspec-rails thanks to [Bill Burcham](http://blog.thoughtpropulsion.com)
-
+mit
 ## Integrating with Rspec-Rails ##
 
 Put this in your Spec::Runner.configure block in spec_helper.rb
@@ -32,3 +31,7 @@ Cucumber stories work too, so:
     rake features
     
 Works.
+
+## License ##
+
+[MIT License](/MIT-LICENSE)
