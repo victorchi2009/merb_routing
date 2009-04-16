@@ -18,24 +18,17 @@ Put this in your Spec::Runner.configure block in spec_helper.rb
    
 ## What Works ##
 
-It looks like routing and URL generation work in running apps. There are some problems however, with specs...
+It looks like routing and URL generation work in running apps and in rspec specs. Both route\_for and params\_from work fine when called from rspec examples.
 
-## What is Broken ##
+## What's Still Broken ##
 
-Routing specs call route\_for and params\_from which in turn call methods in the guts of Rails routing. Until those guts are faked out you'll see errors like this in your routing spec output:
+Cucumber stories fail like this:
 
-    NoMethodError in 'FrooblesController route recognition generates params for #show'
-    undefined method `recognize_path' for #<ActionController::Routing::MerbRoutingWrapper:0x26163d4>
-    ./spec/routing/froobles_routing_spec.rb:48:
- 
-and
+    When I delete the 3rd frooble             # features/step_definitions/frooble_steps.rb:5
+      You have a nil object when you didn't expect it!
+      The error occurred while evaluating nil.host_with_port (NoMethodError)
+      /Users/Bill/Projects/Rails/merb-routing-test/vendor/plugins/merb_routing/lib/merb-routing/url_helpers.rb:22:in `method_missing'
+      ./features/step_definitions/frooble_steps.rb:6:in `/^I delete the (\d+)(?:st|nd|rd|th) frooble$/'
+      features/manage_froobles.feature:23:in `When I delete the 3rd frooble'
 
-    Test::Unit::AssertionFailedError in 'FrooblesController route generation maps #index'
-    The recognized options <{"format"=>nil, "action"=>"index", "controller"=>"froobles"}> did not match <{"action"=>"index",
-    "controller"=>"froobles"}>, difference: <{"format"=>nil}>
-    ./spec/routing/froobles_routing_spec.rb:6:
- 
-We're getting close.
-
-## Something Cool to Try ##
-
+investigating...
