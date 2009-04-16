@@ -26,19 +26,9 @@ It looks like routing and URL generation work in running apps and in rspec specs
     
 That's testing model, controller and routes.
 
-## What's Still Broken ##
-
-Cucumber stories still fail, so if you do something like (the canonical [Cucumber example](http://wiki.github.com/aslakhellesoy/cucumber/ruby-on-rails)):
+Cucumber stories work too, so:
 
     ruby script/generate feature Frooble name:string color:string description:text
+    rake features
     
-you will see one error:
-
-    When I delete the 3rd frooble             # features/step_definitions/frooble_steps.rb:5
-      You have a nil object when you didn't expect it!
-      The error occurred while evaluating nil.host_with_port (NoMethodError)
-      /Users/Bill/Projects/Rails/merb-routing-test/vendor/plugins/merb_routing/lib/merb-routing/url_helpers.rb:22:in `method_missing'
-      ./features/step_definitions/frooble_steps.rb:6:in `/^I delete the (\d+)(?:st|nd|rd|th) frooble$/'
-      features/manage_froobles.feature:23:in `When I delete the 3rd frooble'
-
-investigating...
+Works.

@@ -19,7 +19,7 @@ module Merb::Router::UrlHelpers
         # logic copied from ActionController::UrlRewriter... no support for https (options[:protocol])
         host_prefix << "http://"
         host_prefix << "#{CGI.escape(options.delete(:user))}:#{CGI.escape(options.delete(:password))}@" if options[:user] && options[:password]
-        host_prefix << (options.delete(:host) || request.host_with_port)
+        host_prefix << (options.delete(:host) || ( request ? request.host_with_port : host ))
         host_prefix << ":#{options.delete(:port)}" if options.key?(:port)
       end
       
