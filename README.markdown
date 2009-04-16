@@ -8,7 +8,8 @@ See the [announcement](http://blog.hungrymachine.com/2008/12/29/merb-routing-in-
 
 Ruby on Rails version 2.3.2 thanks to [Piotr Sarnacki](http://drogomir.com/blog)
 
-mit
+Support for rspec-rails and Cucumber thanks to [Bill Burcham](http://blog.thoughtpropulsion.com)
+
 ## Integrating with Rspec-Rails ##
 
 Put this in your Spec::Runner.configure block in spec_helper.rb
@@ -33,5 +34,4 @@ Cucumber stories work too, so:
 Works.
 
 ## License ##
-
-[MIT License](/MIT-LICENSE)
+[MIT License](MIT-LICENSE)
