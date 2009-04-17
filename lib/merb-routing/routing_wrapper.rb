@@ -1,3 +1,18 @@
+module Kernel
+  def capture # pass a block to capture
+     old_stdout = $stdout
+     out = StringIO.new
+     $stdout = out
+     begin
+        yield
+     ensure
+        $stdout = old_stdout
+     end
+     out.string
+  end
+  module_function :capture
+end
+
 class NamedRoutesWrapper
   # the helpers are made protected by default--we make them public for
   # easier access during testing and troubleshooting.
@@ -85,13 +100,17 @@ class ActionController::Routing::MerbRoutingWrapper
     request = ActionController::Request.new( env )
     
     # make the request
-    route_and_params = Merb::Router.route_for(request)
+    begin
+      route_and_params = merb_route_for( request )
+    rescue ActionController::RoutingError
+      # gotta avoid letting that error bubble up lest we break the caller!
+    end
     elide_blank_format( route_and_params.blank? ? {} : route_and_params[1] )
   end
 
   # given a request object, this matches a route, sets route/path_parameters, and returns the controller class
   def recognize(request)
-    request.route, params = Merb::Router.route_for(request)
+    request.route, params = merb_route_for(request)
     request.path_parameters = elide_blank_format( params.with_indifferent_access )
     "#{request.path_parameters[:controller].camelize}Controller".constantize
   end
@@ -151,6 +170,19 @@ class ActionController::Routing::MerbRoutingWrapper
     params
   end
   
+  def merb_route_for( request )
+    Merb::Router.route_for(request)
+  rescue NoMethodError
+    # we catch an error here when no route is found. Merb routing is trying to invoke _process_block_return
+    # on the request at that point but since that method is defined on Merb::Request and not on Rails' request
+    # class, naturally it's not defined.
+    #
+    #   <NoMethodError: undefined method `_process_block_return' for #<ActionController::Request:0x403d2e4>>
+    #
+    # Anyhoo, we need to catch and convert it into what Rails expects. Failure to do this wrecks negative test cases
+    # especially (negative specs)
+    raise ActionController::RoutingError, "no route found to match\n #{ capture { y request } }"
+  end
 end
 
 # automatically use :to_params or :id on active record objects

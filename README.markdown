@@ -33,5 +33,15 @@ Cucumber stories work too, so:
     
 Works.
 
+## Dependencies ##
+
+Requires the rack-test gem:
+
+    sudo gem install rack-test
+
+In environment.rb:
+
+    config.gem 'rack-test', :lib => 'rack/test'
+
 ## License ##
 [MIT License](MIT-LICENSE)
