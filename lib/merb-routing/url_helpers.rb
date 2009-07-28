@@ -6,7 +6,7 @@ module Merb::Router::UrlHelpers
     Merb::Router.url(name, *args)
   end
 
-  def method_missing_with_merb_routing(method_id, *args)
+  def method_missing_with_merb_routing(method_id, *args, &block)
     if /^(formatted_)?(.*)(_url|_path)$/.match(method_id.to_s)
       route_name = $2.to_sym
       options, args = args.last.is_a?(Hash) ? [args.pop, args] : [{}, args]
@@ -26,8 +26,25 @@ module Merb::Router::UrlHelpers
       
       return host_prefix + Merb::Router.url(route_name, *(args << options << {}))
     else
-      method_missing_without_merb_routing(method_id, *args)
+      method_missing_without_merb_routing(method_id, *args, &block)
     end
   end
-  alias_method_chain :method_missing, :merb_routing
 end
+
+__END__
+
+# Put this in your spec_helper.rb to help Merb Routing and RSpec play nice together.
+
+module MerbRoutingRspecHoneymoon
+  include ActionController::Routing::Helpers
+  include Merb::Router::UrlHelpers
+
+  def method_missing(sym, *args, &block)     
+    return method_missing_with_merb_routing(sym, *args) if /^(formatted_)?(.*)(_url|_path)$/.match(sym.to_s)
+    return Spec::Matchers::Be.new(sym, *args) if sym.to_s =~ /^be_/
+    return Spec::Matchers::Has.new(sym, *args) if sym.to_s =~ /^have_/
+    super
+  end
+end
+
+ActiveSupport::TestCase.send(:include, MerbRoutingRspecHoneymoon)

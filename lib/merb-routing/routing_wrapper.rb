@@ -47,6 +47,7 @@ class ActionController::Routing::MerbRoutingWrapper
     klass.module_eval do
       include ActionController::Routing::Helpers
       include Merb::Router::UrlHelpers
+      alias_method_chain :method_missing, :merb_routing
     end
   end
   
