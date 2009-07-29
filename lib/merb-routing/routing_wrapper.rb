@@ -137,6 +137,11 @@ class ActionController::Routing::MerbRoutingWrapper
         best_score, best_route = score, route if score > best_score
       end
     end
+    
+    unless best_route
+      raise ActionController::RoutingError, "No route matches #{merged_options.inspect}"
+    end
+    
     @keys_we_dont_need = best_route.params.reject { |k,v| !(v =~ /^"(.*)"$/ && merged_options[k] == $1) }.keys
     nonredundant_options = options.reject { |k,v| @keys_we_dont_need.include?(k) }
 
