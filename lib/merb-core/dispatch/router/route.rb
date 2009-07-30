@@ -1,3 +1,5 @@
+require 'rack/utils'
+
 module Merb
 
   class Router
@@ -366,7 +368,7 @@ module Merb
           segments.each_with_index do |segment, i|
             bits << case
               when segment.is_a?(String) then segment
-              when segment.is_a?(Symbol) then '#{cached_' + segment.to_s + '}'
+              when segment.is_a?(Symbol) then '#{Rack::Utils.escape(cached_' + segment.to_s + ')}'
               when segment.is_a?(Array) && segment.any? { |s| !s.is_a?(String) } then "\#{#{@opt_segment_stack.last.shift}}"
               else ""
             end
